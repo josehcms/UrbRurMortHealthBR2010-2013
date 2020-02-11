@@ -2,7 +2,7 @@
 ### Title: Urban-Rural life tables and Sullivan Life tables
 ### Author: Jose H C Monteiro da Silva
 ### Github: josehcms
-### Last version: 2020-02-10
+### Last version: 2020-02-11
 ###################################################################
 
 ### 1. Housekeeping #----------------------------------------------
@@ -34,6 +34,7 @@ pns.dat <-
 
 ### 3. Construct life table for BR2010 census #--------------------
 
+# 3.1 Using Demotools Function
 lt.dat <- data.table()
 
 for( sexsel in c( 'm', 'f' ) ){
@@ -64,6 +65,59 @@ for( sexsel in c( 'm', 'f' ) ){
   }
 }
 
+# Alternative way - only for adult population aged 20+
+
+# LifeTable <- function( Age, Deaths, Exposures ){
+#   x = Age
+#   nMx = Deaths / Exposures
+#   nmax <- length(x)
+#   #nMx = nDx/nKx
+#   n <- c(diff(x), 999)          		  # width of the intervals
+#   nax <- n/2;		            	        # default to .5 of interval
+#   nax[nmax] <- 1/nMx[nmax] 	  	      # e_x at open age interval
+#   nqx <- (n * nMx) / (1 + (n - nax) * nMx)
+#   nqx<-ifelse(nqx > 1, 1, nqx);		    # necessary for high nMx
+#   nqx[nmax] <- 1.0
+#   lx <- c(1, cumprod(1 - nqx))*100000;   	  # survivorship lx
+#   lx <- lx[1:length(nMx)]
+#   ndx <- lx * nqx;
+#   nLx <- n * lx - nax * ndx;      	 # equivalent to n*l(x+n) + (n-nax)*ndx
+#   nLx[nmax] <- lx[nmax] * nax[nmax]
+#   Tx <- rev(cumsum(rev(nLx)))
+#   ex <- ifelse( lx[1:nmax] > 0, Tx/lx[1:nmax], NA);
+#   lt <- data.table(Age = x, nqx = nqx, lx = lx, nLx = nLx, Tx = Tx, ex = ex, nMx = nMx)
+#   return(lt)
+# }
+# 
+# lt.dat <- data.table()
+# 
+# for( sexsel in c( 'm', 'f' ) ){
+#   for( urbsel in c( 'urb', 'rur' ) ){
+#     lt.dat <-
+#       rbind(
+#         lt.dat,
+#         LifeTable(
+#           Deaths    = census.dat[ sex == sexsel & urb == urbsel & age %in% 20:80 ]$deaths.ggbseg,
+#           Exposures = census.dat[ sex == sexsel & urb == urbsel & age %in% 20:80 ]$pop,
+#           Age       = census.dat[ sex == sexsel & urb == urbsel & age %in% 20:80 ]$age
+#         ) %>%
+#           as.data.table %>%
+#           .[,
+#             list(
+#               urb = urbsel,
+#               sex = sexsel,
+#               age = Age,
+#               mx  = round( nMx, 6 ),
+#               qx  = round( nqx, 6 ),
+#               lx  = round(  lx, 0 ),
+#               nLx = round( nLx, 0 ),
+#               ex  = round(  ex, 1 )
+#             )
+#             ]
+#       )
+#   }
+# }
+
 ###################################################################
 
 ### 4. Merge life table and disability data #----------------------
@@ -72,11 +126,13 @@ lt.dat <-
   merge(
     lt.dat,
     pns.dat[, .( urb, sex, age, dsblty.cardio, dsblty.osteop, dsblty.diabetes ) ],
-    by = c( 'urb', 'sex', 'age' )
+    by = c( 'urb', 'sex', 'age' ),
+    all.x = TRUE
   ) %>%
   merge(
     census.dat[, .( urb, sex, age, dsblty.census = round( dsblty.census / pop, 5 ) ) ],
-    by = c( 'urb', 'sex', 'age' )
+    by = c( 'urb', 'sex', 'age' ),
+    all.x = TRUE
   )
 ###################################################################
 
@@ -107,10 +163,12 @@ lt_sullivan <-
     ltSulli <- 
       data.table( 
         age         = age,
-        lx          = lx,
+        lx          = lx / 100000,
         dsblty.prev = AgePrev,
-        nLx         = nLx,
-        nLx.Sulli   = nLx.Sulli,
+        nLx         = nLx / 100000,
+        nLx.Sulli   = nLx.Sulli / 100000,
+        Tx          = Tx / 100000,
+        Tx.Sulli    = Tx.Sulli / 100000,
         ex          = ex,
         ex.Sulli    = ex.Sulli
         )
@@ -126,7 +184,8 @@ ltMelt.dat <-
        measure.vars  = c( 'dsblty.cardio', 'dsblty.osteop', 'dsblty.diabetes', 'dsblty.census' ),
        variable.name = 'dsblty.type',
        value.name    = 'dsblty.prev'
-       )
+       ) %>%
+  .[, dsblty.prev := ifelse( is.na( dsblty.prev ), 0, dsblty.prev ) ]
 
 # 5.3 Smooth disability data using loess:
 ltMelt.dat[,
@@ -162,12 +221,14 @@ for( urbsel in c( 'urb', 'rur' ) ){
                 age,
                 mx  = ltMelt.dat[ urb == urbsel & sex == sexsel & dsblty.type == dsbType ]$mx,
                 qx  = ltMelt.dat[ urb == urbsel & sex == sexsel & dsblty.type == dsbType ]$qx,
-                lx  = round(  lx, 0 ),
-                nLx = round( nLx, 0 ),
+                lx  = round(  lx, 5 ),
+                nLx = round( nLx, 5 ),
+                Tx  = round(  Tx, 5 ),
                 ex  = round(  ex, 1 ),
                 dsblty.type = dsbType,
                 dsblty.prev = dsblty.prev,
-                nLx.Sulli = nLx.Sulli,
+                nLx.Sulli = round( nLx.Sulli, 5 ),
+                Tx.Sulli  = round( Tx.Sulli, 5 ),
                 ex.Sulli
                 )
               ]
