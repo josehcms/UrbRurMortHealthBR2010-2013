@@ -20,18 +20,14 @@ require(DemoTools)
 # 2.1 Sullivan Life Table and General Life Table
 ltSulli <- 
   readRDS(
-    file = "DATA/LifeTableSulli.rds"
+    file = "DATA/LifeTableSulliAdult.rds"
   )
 
 ###################################################################
 
-### 3. Decomposition of life expectancy differentials #------------
+### 3. Decomposition of disease free life expectancy #-------------
 
-
-###################################################################
-
-### 4. Decomposition of disease free life expectancy #-------------
-
+# 3.1 Create function for decomposition of health differences
 HealthDecomp.Andreev <-
   function(
     age,
@@ -148,7 +144,7 @@ HealthDecomp.Andreev <-
     
   }
 
-
+# 3.2 Create data by applying decomposition function
 HthDecomp.dat <- data.table()
 
 for( sexsel in c( 'm', 'f' ) ){
@@ -156,15 +152,16 @@ for( sexsel in c( 'm', 'f' ) ){
     HthDecomp.dat <- 
       rbind(
         HthDecomp.dat,
-        HealthDecomp.Andreev(age = ltSulli[ urb == 'urb' & sex == sexsel & dsblty.type == prevsel ]$age,
-                             lx1 = ltSulli[ urb == 'urb' & sex == sexsel & dsblty.type == prevsel ]$lx,
-                             lx2 = ltSulli[ urb == 'rur' & sex == sexsel & dsblty.type == prevsel ]$lx,
-                             qx1 = ltSulli[ urb == 'urb' & sex == sexsel & dsblty.type == prevsel ]$qx,
-                             qx2 = ltSulli[ urb == 'rur' & sex == sexsel & dsblty.type == prevsel ]$qx,
-                             nLx1 = ltSulli[ urb == 'urb' & sex == sexsel & dsblty.type == prevsel ]$nLx,
-                             nLx2 = ltSulli[ urb == 'rur' & sex == sexsel & dsblty.type == prevsel ]$nLx,
-                             pi1 = 1-ltSulli[ urb == 'urb' & sex == sexsel & dsblty.type == prevsel ]$dsblty.prev,
-                             pi2 = 1-ltSulli[ urb == 'rur' & sex == sexsel & dsblty.type == prevsel ]$dsblty.prev
+        HealthDecomp.Andreev(
+          age  =     ltSulli[ urb == 'urb' & sex == sexsel & dsblty.type == prevsel ]$age,
+          lx1  =     ltSulli[ urb == 'urb' & sex == sexsel & dsblty.type == prevsel ]$lx,
+          lx2  =     ltSulli[ urb == 'rur' & sex == sexsel & dsblty.type == prevsel ]$lx,
+          qx1  =     ltSulli[ urb == 'urb' & sex == sexsel & dsblty.type == prevsel ]$qx,
+          qx2  =     ltSulli[ urb == 'rur' & sex == sexsel & dsblty.type == prevsel ]$qx,
+          nLx1 =     ltSulli[ urb == 'urb' & sex == sexsel & dsblty.type == prevsel ]$nLx,
+          nLx2 =     ltSulli[ urb == 'rur' & sex == sexsel & dsblty.type == prevsel ]$nLx,
+          pi1  = 1 - ltSulli[ urb == 'urb' & sex == sexsel & dsblty.type == prevsel ]$dsblty.prev,
+          pi2  = 1 - ltSulli[ urb == 'rur' & sex == sexsel & dsblty.type == prevsel ]$dsblty.prev
         ) %>%
           .[, sex := sexsel ] %>%
           .[, dsblty.type := prevsel ]
@@ -172,67 +169,8 @@ for( sexsel in c( 'm', 'f' ) ){
   }
 }
 
-text_data <- 
-  HthDecomp.dat %>%
-  copy %>%
-  .[,type_diff:=sum(d),
-    .(dsblty.type,sex,type)] %>%
-  .[,.(type,dsblty.type,sex,type_diff)] %>% 
-  unique %>%
-  dcast(dsblty.type+sex~type,value.var=c('type_diff')) %>%
-  .[,diff:=gama+lambda] %>%
-  setnames(c('dsblty.type','sex','mdiff','hdiff','diff')) %>%
-  .[,`:=`(
-    x = 20,
-    y = 2.0
-  )]
-
-    
-dic_age <- 
-  c('0'='0-4','5'='5-9','10'='10-14','15'='15-19','20'='20-24','25'='25-29','30'='30-34','35'='35-39',
-    '40'='40-44','45'='45-49','50'='50-54','55'='55-59','60'='60-64','65'='65-69','70'='70-74','75'='75-79',
-    '80'='+80')
-
-
-require(ggplot2)
-ggplot(data=HthDecomp.dat) +
-  geom_col(aes( x=age , y=d , fill=type ),
-           position = 'stack',
-           color = 'black')+
-  scale_fill_manual(values=c('lambda'='black',
-                             'gama'='gray60'),
-                    name='') +
-  facet_grid(sex~dsblty.type,scales='free')+
-  scale_y_continuous(limits = c(-1,2.5), 
-                     breaks = seq(-1,3,0.50), 
-                     name = 'Rural-Urban differences in DFLE')+
-  scale_x_continuous(limits = c(17.5,72.5), 
-                     breaks = seq(20,70,5), 
-                     labels = dic_age[as.character(seq(20,70,5))],
-                     name='')+
-  theme_bw() + 
-  theme(legend.position = 'top',
-        legend.direction = 'horizontal',
-        legend.text = element_text(size=14,color='black'),
-        axis.title = element_text(size=14,color='black'),
-        axis.text.x = element_text(size=12,color='black',angle = 90,vjust = 0.5,hjust=1),
-        axis.text.y = element_text(size=12,color='black'),
-        panel.grid.minor = element_blank(),
-        strip.text = element_text(size=14,color='black'),
-        plot.caption = element_text(hjust=0,size=12))+
-  geom_text(data=text_data,
-            aes(x=x,y=y,
-                label= paste0('DFLE(20) Rural-Urban: ',
-                              round(unique(diff),2),
-                              '\n',
-                              'Mortality difference: ',
-                              round(unique(mdiff),2),
-                              '\n',
-                              'Health difference: ',
-                              round(unique(hdiff),2))),
-            hjust=0)
-
-    
-
-    
+# 3.3 Save data
+saveRDS( HtdDecomp.dat, file = 'DATA/HealthDecompAndreev.rds' )
 ###################################################################
+
+### THE END
