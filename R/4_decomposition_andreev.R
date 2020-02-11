@@ -170,7 +170,7 @@ for( sexsel in c( 'm', 'f' ) ){
 }
 
 # 3.3 Save data
-saveRDS( HtdDecomp.dat, file = 'DATA/HealthDecompAndreev.rds' )
+saveRDS( HthDecomp.dat, file = 'DATA/HealthDecompAndreev.rds' )
 ###################################################################
 
 ### THE END
