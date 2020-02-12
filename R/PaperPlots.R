@@ -219,17 +219,17 @@ DsbPrevPlot <-
   theme_bw() +
   scale_color_manual(
     values = c( 'urb' = 'black', 'rur' = 'gray60' ),
-    labels = c( 'Urban', 'Rural' ),
+    labels = c( 'urb' = 'Urban', 'rur' = 'Rural' ),
     name = ''
     ) +
   scale_shape_manual(
     values = c( 'urb' = 19, 'rur' = 4 ),
-    labels = c( 'Urban', 'Rural' ),
+    labels = c( 'urb' = 'Urban', 'rur' = 'Rural' ),
     name   = ''
     ) +
   scale_linetype_manual(
     values = c( 'urb' = 1, 'rur' = 1 ),
-    labels = c( 'Urban', 'Rural' ),
+    labels = c( 'urb' = 'Urban', 'rur' = 'Rural' ),
     name   = ''
     ) + 
   theme(
