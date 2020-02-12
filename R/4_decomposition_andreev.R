@@ -2,7 +2,7 @@
 ### Title: Decomposition of Ex and DFLEx
 ### Author: Jose H C Monteiro da Silva
 ### Github: josehcms
-### Last version: 2020-02-11
+### Last version: 2020-02-12
 ###################################################################
 
 ### 1. Housekeeping #----------------------------------------------
@@ -20,7 +20,7 @@ require(DemoTools)
 # 2.1 Sullivan Life Table and General Life Table
 ltSulli <- 
   readRDS(
-    file = "DATA/LifeTableSulliAdult.rds"
+    file = "DATA/LifeTableSulli.rds"
   )
 
 ###################################################################
