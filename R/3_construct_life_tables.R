@@ -2,7 +2,7 @@
 ### Title: Urban-Rural life tables and Sullivan Life tables
 ### Author: Jose H C Monteiro da Silva
 ### Github: josehcms
-### Last version: 2020-02-11
+### Last version: 2020-02-12
 ###################################################################
 
 ### 1. Housekeeping #----------------------------------------------
@@ -65,8 +65,8 @@ for( sexsel in c( 'm', 'f' ) ){
   }
 }
 
-# Alternative way - only for adult population aged 20+
-
+# # Alternative way - only for adult population aged 20+
+# 
 # LifeTable <- function( Age, Deaths, Exposures ){
 #   x = Age
 #   nMx = Deaths / Exposures
@@ -189,7 +189,11 @@ ltMelt.dat <-
 
 # 5.3 Smooth disability data using loess:
 ltMelt.dat[,
-           dsblty.prev := round( loess( dsblty.prev ~ age, degree = 1, span = 0.4 )$fitted, 5 ),
+           dsblty.prevUns := dsblty.prev # UnSmothed
+           ]
+
+ltMelt.dat[,
+           dsblty.prev := round( loess( dsblty.prevUns ~ age, degree = 1, span = 0.4 )$fitted, 5 ),
            by = c( 'urb', 'sex', 'dsblty.type' )
            ]
 
@@ -237,8 +241,16 @@ for( urbsel in c( 'urb', 'rur' ) ){
   }
 }
 
-# 5.5 Save LT data
-saveRDS( ltSulli.dat, file = 'DATA/LifeTableSulli.rds')
+# 5.5 Add Unsmoothed prev data to Sullidat
+ltSulli.dat <- 
+  merge(
+    ltSulli.dat,
+    ltMelt.dat[, .( urb, sex, age, dsblty.type, dsblty.prevUns ) ],
+    by = c( 'urb', 'sex', 'age', 'dsblty.type' )
+  )
+
+# 5.6 Save LT data
+saveRDS( ltSulli.dat, file = 'DATA/LifeTableSulliAdult.rds')
 
 ##################################################################
 
