@@ -88,7 +88,7 @@ HthDecompText.dat <-
                mdiff = sum( d[ type == 'Mortality' ] ),
                hdiff = sum( d[ type == 'Health' ] ),
                x = 20,
-               y = 2.0
+               y = 1.25
              ),
              by = c( 'sex', 'dsblty.type' )
              ]
@@ -104,7 +104,7 @@ HthDecompPlot <-
          color    = 'black'
     ) +
   scale_fill_manual(
-    values = c( 'Mortality' = 'black', 'Health' = 'gray60' ),
+    values = c( 'Mortality' = 'gray20', 'Health' = 'gray60' ),
     name   = ''
     ) +
   facet_grid(
@@ -112,8 +112,8 @@ HthDecompPlot <-
     scales = 'free'
     ) +
   scale_y_continuous(
-    limits = c( -1, 2.5 ),
-    breaks = seq( -1, 3, 0.50 ),
+    limits = c( -0.75, 1.5 ),
+    breaks = seq( -1, 3, 0.25 ),
     name   = 'Rural-Urban differences in DFLE'
     ) +
   scale_x_continuous(
@@ -130,7 +130,7 @@ HthDecompPlot <-
     axis.text.x      = element_text( size = 11, color = 'black', angle = 90, vjust = 0.5, hjust=1 ),
     axis.text.y      = element_text( size = 12, color = 'black' ),
     panel.grid.minor = element_blank(),
-    panel.grid.major = element_line( size = 0.5, linetype = 3, color = 'gray85' ),
+    panel.grid.major = element_line( size = 0.25, linetype = 5, color = 'gray90' ),
     strip.text       = element_text( size  = 13, color = 'black' ),
     plot.caption     = element_text( hjust = 0,  size  = 12 )
     ) +
@@ -240,7 +240,7 @@ DsbPrevPlot <-
     axis.text.x      = element_text( size = 11, color = 'black', angle = 90, vjust = 0.5, hjust=1 ),
     axis.text.y      = element_text( size = 11, color = 'black' ),
     panel.grid.minor = element_blank(),
-    panel.grid.major = element_line( size = 0.5, linetype = 3, color = 'gray85' ),
+    panel.grid.major = element_line( size = 0.25, linetype = 5, color = 'gray90' ),
     strip.text       = element_text( size  = 13, color = 'black' ),
     plot.caption     = element_text( hjust = 0,  size  = 12 )
   )
