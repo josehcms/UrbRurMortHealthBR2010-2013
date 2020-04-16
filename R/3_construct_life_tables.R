@@ -2,7 +2,7 @@
 ### Title: Urban-Rural life tables and Sullivan Life tables
 ### Author: Jose H C Monteiro da Silva
 ### Github: josehcms
-### Last version: 2020-02-12
+### Last version: 2020-04-16
 ###################################################################
 
 ### 1. Housekeeping #----------------------------------------------
@@ -64,6 +64,8 @@ for( sexsel in c( 'm', 'f' ) ){
       )
   }
 }
+
+saveRDS( lt.dat, file = 'DATA/LifeTable.rds')
 
 # # Alternative way - only for adult population aged 20+
 # 
