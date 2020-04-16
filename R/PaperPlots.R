@@ -166,14 +166,14 @@ plot1.mx <-
     axis.title       = element_text( size = 13, color = 'black' ),
     axis.text.x      = element_text( size = 11, color = 'black', angle = 90, vjust = 0.5, hjust=1 ),
     axis.text.y      = element_text( size = 11, color = 'black' ),
-    panel.grid.minor = element_line( size = 0.00, linetype = 3, color = 'gray87' ),
-    panel.grid.major = element_line( size = 0.45, linetype = 3, color = 'gray80' ),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line( size = 0.25, linetype = 5, color = 'gray90' ),
     strip.text       = element_text( size  = 13, color = 'black' ),
     plot.caption     = element_text( hjust = 1,  size  = 9 )
   )
 
 ggsave(
-  'FIGURES/plot1_mx.png', 
+  'FIGURES/1_plot1_mx.eps', 
   width  = 8, 
   height = 4, 
   dpi    = 300
@@ -198,7 +198,8 @@ tab1.ex <-
       )
     ]
 
-write.table( tab1.ex, 'FIGURES/table1_ex.csv', row.names = F)
+write.table( tab1.ex, 'FIGURES/2_table1_ex.csv', 
+            row.names = F, dec = '.', sep = ';' )
 ###################################################################
 
 ### 6. Prevalences plot #------------------------------------------
@@ -285,13 +286,13 @@ DsbPrevPlot <-
     axis.text.x      = element_text( size = 10, color = 'black', angle = 90, vjust = 0.5, hjust=1 ),
     axis.text.y      = element_text( size = 10, color = 'black' ),
     panel.grid.minor = element_blank(),
-    panel.grid.major = element_line( size = 0.25, linetype = 3, color = 'gray85' ),
+    panel.grid.major = element_line( size = 0.25, linetype = 5, color = 'gray90' ),
     strip.text       = element_text( size  = 13, color = 'black' ),
     plot.caption     = element_text( hjust = 0,  size  = 12 )
   )
 
 ggsave(
-  'FIGURES/plot2_prevalence.png', 
+  'FIGURES/3_plot2_prevalence.eps', 
   width  = 8, 
   height = 4, 
   dpi    = 300
@@ -318,7 +319,8 @@ tab2.sulli <-
       rur_f
     )]
 
-write.table( tab2.sulli, 'FIGURES/table2_health.csv', row.names = F)
+write.table( tab2.sulli, 'FIGURES/4_table2_health.csv', 
+             row.names = F, dec = '.', sep = ';' )
 ###################################################################
 
 
@@ -349,7 +351,7 @@ HthDecompText.dat <-
                mdiff = sum( d[ type == 'Mortality' ] ),
                hdiff = sum( d[ type == 'Health' ] ),
                x = 20,
-               y = 1.225
+               y = 1.20
              ),
              by = c( 'sex', 'dsblty.type' )
              ]
@@ -366,7 +368,8 @@ HthDecompPlot <-
     ) +
   scale_fill_manual(
     values = c( 'Mortality' = 'gray20', 'Health' = 'gray60' ),
-    labels = c( 'Mortality Rates', 'Health Prevalence Rates' ),
+    labels = c( 'Differences due to Mortality Rates', 
+                'Differences due to Disease/Disability Prevalence Rates' ),
     name   = ''
     ) +
   facet_grid(
@@ -386,7 +389,7 @@ HthDecompPlot <-
   theme_bw() + 
   theme(
     legend.position  = 'top',
-    legend.direction = 'horizontal',
+    legend.direction = 'vertical',
     legend.text      = element_text( size = 12, color = 'black' ),
     axis.title       = element_text( size = 12, color = 'black' ),
     axis.text.x      = element_text( size = 10, color = 'black', angle = 90, vjust = 0.5, hjust=1 ),
@@ -411,11 +414,11 @@ HthDecompPlot <-
                          )
          ),
     hjust = 0,
-    size  = 2.7
+    size  = 2.4
     )
 
 ggsave(
-  'FIGURES/plot3_decomp.png', 
+  'FIGURES/5_plot3_decomp.eps', 
   width  = 8, 
   height = 5, 
   dpi    = 300
