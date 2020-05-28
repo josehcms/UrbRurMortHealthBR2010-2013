@@ -58,7 +58,7 @@ We assume that regional inequalities of death coverage may already account at so
 
 #### Morbidity-free life expectancy estimation by Sullivan method
 
-The second step was to estimate disability-free life expectancy. We use the Sullivan method uses data from diseases prevalence to construct a single index of mortality and morbidity, 64–66. The index provides an estimate of years of life free of disability that a member of the  cohort would experience if the current age-specific rates of mortality and disease/disability prevalence prevailed throughout the cohort’s lifetime64.
+The second step was to estimate disability-free life expectancy. We use the Sullivan method uses data from diseases prevalence to construct a single index of mortality and morbidity[@sullivan1971;@EHEMU2014]. The index provides an estimate of years of life free of disability that a member of the  cohort would experience if the current age-specific rates of mortality and disease/disability prevalence prevailed throughout the cohort’s lifetime64.
 
 The basic inputs of the method are the age-specific mortality rates for life table functions estimation and age-specific disease or disability (morbidity) prevalence ($_nP_x$). After the estimation of life table functions using mortality rates as inputs, the complement of the morbidity prevalence (morbidity-free prevalence) are multiplied by the person-years lived ($_nL_x$) for each age group (equation 1).
 
