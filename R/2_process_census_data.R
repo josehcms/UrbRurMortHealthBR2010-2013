@@ -46,17 +46,21 @@ person.dat <-
                  reg         = as.numeric( substr( V0011, 1, 1 ) ),
                  person.wght = V0010,
                  sex         = ifelse( V0601 == 1, 'm', 'f' ),
-                 age         = as.numeric( paste0( cut( V6036,
-                                                        breaks = c( 0, 1, seq( 5, 80, 5 ), Inf ),
-                                                        labels = c( 0, 1, seq( 5, 80, 5 ) ),
-                                                        right  = FALSE
-                                                        )
-                                                   )
-                                           ),
+                 # age         = as.numeric( paste0( cut( V6036,
+                 #                                        breaks = c( 0, 1, seq( 5, 80, 5 ), Inf ),
+                 #                                        labels = c( 0, 1, seq( 5, 80, 5 ) ),
+                 #                                        right  = FALSE
+                 #                                        )
+                 #                                   )
+                 #                           ),
+                 age         = ifelse( as.numeric( V6036 ) > 89,
+                                       90,
+                                       as.numeric( V6036 ) ),
                  dsblty.census = ifelse( ( V0614 %in% c( 1, 2 ) ) | ( V0615 %in% c( 1, 2 ) ) | ( V0616 %in% c( 1, 2 ) ), 1, 0 )
                  )
                ] ,
-    hshold.dat[, .( hshold.id = V0300, urb = ifelse( V1006 == 1, 'urb', 'rur' ) ) ],
+    hshold.dat[, .( hshold.id = V0300, 
+                    urb = ifelse( V1006 == 1, 'urb', 'rur' ) ) ],
     by = 'hshold.id',
     all.x = T
   ) %>%
@@ -76,13 +80,16 @@ mort.dat <-
                reg         = as.numeric( substr( V0011, 1, 1 ) ),
                person.wght = V0010,
                sex         = ifelse( V0704 == 1, 'm', 'f' ),
-               age         = as.numeric( paste0( cut( as.numeric( idade ),
-                                                      breaks = c( 0, 1, seq( 5, 80, 5 ), Inf ),
-                                                      labels = c( 0, 1, seq( 5, 80, 5 ) ),
-                                                      right  = FALSE
-                                                      )
-                                                 )
-                                         )
+               # age         = as.numeric( paste0( cut( as.numeric( idade ),
+               #                                        breaks = c( 0, 1, seq( 5, 80, 5 ), Inf ),
+               #                                        labels = c( 0, 1, seq( 5, 80, 5 ) ),
+               #                                        right  = FALSE
+               #                                        )
+               #                                   )
+               #                           )
+               age         = ifelse( as.numeric( idade ) > 89,
+                                     90,
+                                     as.numeric( idade ) )
                )
              ],
     hshold.dat[, .( hshold.id = V0300, urb = ifelse( V1006 == 1, 'urb', 'rur' ) ) ],
@@ -132,10 +139,10 @@ census.dat <-
                deaths        = sum( deaths ),
                deaths.ggbseg = sum( deaths.ggbseg )
              ),
-             by = c( 'urb', 'sex', 'age' )
+             by = c( 'reg', 'urb', 'sex', 'age' )
              ]
       
-saveRDS( census.dat, file = 'DATA/BRCENSUS2010AdjDeaths.rds')
+saveRDS( census.dat, file = 'DATA/BRCENSUS2010AdjDeathsSingleAges.rds')
 
 ##################################################################
 
