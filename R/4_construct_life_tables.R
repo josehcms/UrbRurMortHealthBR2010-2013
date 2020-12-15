@@ -157,7 +157,7 @@ for( sexsel in c( 'm', 'f' ) ){
 lt_dat <- 
   rbind(
     lt_reg[ , type := 'reg' ],
-    lt_rur[ , type := 'urbrur' ]
+    lt_urb[ , type := 'urbrur' ]
     )
 
 write.table( lt_dat,

@@ -233,5 +233,123 @@ write.table( decompres,
              file = 'DATA/PROCESSED/stepwisedecomp_results.csv',
              row.names = F )
 
+### plot 
+dic_dsbType <-
+  c(
+    'px_cardio'        = 'Carviovascular\nDiseases', 
+    'px_osteop'        = 'Osteopathies', 
+    'px_diabetes'      = 'Diabetes', 
+    'px_dsblty_census' = 'Census\nDisabilities'
+  )
+dic_age <- 
+  c('0'='0-4','5'='5-9','10'='10-14','15'='15-19','20'='20-24','25'='25-29','30'='30-34','35'='35-39',
+    '40'='40-44','45'='45-49','50'='50-54','55'='55-59','60'='60-64','65'='65-69','70'='70-74','75'='75-79',
+    '80'='+80')
+decompres
+HthDecomp <- 
+  decompres %>%
+  melt(
+    id.vars = c( 'x', 'sex', 'dsblty' ),
+    measure.vars = c( 'mx_cntrb', 'px_cntrb' ),
+    value.name = 'cntrb',
+    variable.name = 'type'
+    ) %>%
+  .[,
+    list(
+      age  = x, 
+      sex  = factor( sex,
+                     levels = c( 'm', 'f' ),
+                     labels = c( 'Males', 'Females' ) 
+                     ),
+      type = factor( type,
+                     levels = c( 'mx_cntrb', 'px_cntrb' ),
+                     labels = c( 'Mortality', 'Health' ) 
+            ),
+      dsblty.type  = factor( dic_dsbType[ as.character( dsblty ) ], 
+                             levels = c( 'Carviovascular\nDiseases',
+                                         'Diabetes',
+                                         'Osteopathies',
+                                         'Census\nDisabilities' )
+                             ),
+      d = cntrb
+      )
+    ]
 
+HthDecomp
+# 8.2 Generate differences to input into decomposition graphs
+HthDecompText.dat <-
+  HthDecomp[ age >= 20,
+             list(
+               diff  = sum( d ),
+               mdiff = sum( d[ type == 'Mortality' ] ),
+               hdiff = sum( d[ type == 'Health' ] ),
+               x = 20,
+               y = 1.20
+             ),
+             by = c( 'sex', 'dsblty.type' )
+  ]
+
+# 8.3 Plot
+require( ggplot2 )
+HthDecompPlot <- 
+  ggplot(
+    data = HthDecomp[ age >= 20 ]
+  ) +
+  geom_col(
+    aes( x = age , y = d , fill = type ),
+    position = 'stack',
+    color    = 'black'
+  ) +
+  scale_fill_manual(
+    values = c( 'Mortality' = 'gray20', 'Health' = 'gray60' ),
+    labels = c( 'Differences due to Mortality Rates', 
+                'Differences due to Disease/Disability Prevalence Rates' ),
+    name   = ''
+  ) +
+  facet_grid(
+    sex ~ dsblty.type,
+    scales = 'free'
+  ) +
+  scale_y_continuous(
+    limits = c( -0.75, 1.5 ),
+    breaks = seq( -1, 3, 0.25 ),
+    name   = 'Rural-Urban differences in h(x)'
+  ) +
+  scale_x_continuous(
+    limits = c( 17.5, 82.5 ),
+    breaks = seq( 20, 80, 5 ),
+    labels = dic_age[ as.character( seq( 20, 80, 5 ) ) ],
+    name   = '')+
+  theme_bw() + 
+  theme(
+    legend.position  = 'top',
+    legend.direction = 'vertical',
+    legend.text      = element_text( size = 12, color = 'black' ),
+    axis.title       = element_text( size = 12, color = 'black' ),
+    axis.text.x      = element_text( size = 10, color = 'black', angle = 90, vjust = 0.5, hjust=1 ),
+    axis.text.y      = element_text( size = 10, color = 'black' ),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line( size = 0.25, linetype = 5, color = 'gray90' ),
+    strip.text       = element_text( size  = 12, color = 'black' ),
+    plot.caption     = element_text( hjust = 0,  size  = 12 )
+  ) +
+  geom_text(
+    data = HthDecompText.dat,
+    aes( x     = x, 
+         y     = y,
+         label = paste0( 'h(20) Rural - Urban: ',
+                         format( round( unique( diff ), 1 ), nsmall = 1 ),
+                         '\n',
+                         'Mortality contribution: ',
+                         format( round( unique( mdiff ), 1 ), nsmall = 1 ),
+                         '\n',
+                         'Health contribution: ',
+                         format( round( unique( hdiff ), 1 ), nsmall = 1 ) 
+         )
+    ),
+    hjust = 0,
+    size  = 2.4
+  )
+
+HthDecompPlot
 ### THE END
