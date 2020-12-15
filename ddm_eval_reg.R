@@ -143,6 +143,7 @@ dat2010adj <-
      ),
      .( urb, sex, age ) ]
 
+saveRDS( dat2010adj, file = 'DATA/BRCENSUS2010AdjDeathsReg.rds')
 dat2010adj[ , mx := deaths_adj / ( pop + deaths_adj / 2 ) ]
 
 dat2010adj_reg <- 

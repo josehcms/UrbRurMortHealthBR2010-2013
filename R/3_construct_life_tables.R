@@ -20,7 +20,7 @@ require(DemoTools)
 # 2.1 2010 National Census data
 census.dat <- 
   readRDS(
-    file = "DATA/BRCENSUS2010AdjDeaths.rds"
+    file = "DATA/BRCENSUS2010AdjDeathsUrb.rds"
   )
 
 # 2.2 2013 national health survey data
@@ -43,7 +43,7 @@ for( sexsel in c( 'm', 'f' ) ){
       rbind(
         lt.dat,
         lt_abridged(
-          Deaths    = census.dat[ sex == sexsel & urb == urbsel ]$deaths.ggbseg,
+          Deaths    = census.dat[ sex == sexsel & urb == urbsel ]$deaths_adj,
           Exposures = census.dat[ sex == sexsel & urb == urbsel ]$pop,
           Age       = census.dat[ sex == sexsel & urb == urbsel ]$age,
           Sex       = sexsel 
