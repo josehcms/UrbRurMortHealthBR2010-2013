@@ -351,5 +351,9 @@ HthDecompPlot <-
     size  = 2.4
   )
 
+ggsave(
+  filename = 'FIGURES/5_plot3_decomp.png',
+  height = 6, width = 8 
+)
 HthDecompPlot
 ### THE END
