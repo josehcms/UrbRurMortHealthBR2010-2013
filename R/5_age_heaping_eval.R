@@ -2,7 +2,7 @@
 require( data.table ); require( tidyverse ); require( readr )
 
 dat_census <- 
-  readRDS('DATA/BRCENSUS2010AdjDeathsSingleAges.rds') %>%
+  fread('DATA/PROCESSED/population_deaths_region_processed.csv') %>%
   .[ , .( pop = sum( pop ), deaths = sum( deaths ) ),
      .( urb, sex, age ) ] %>%
   .[ , pop_prop :=  ifelse( sex == 'm',
@@ -12,7 +12,9 @@ dat_census <-
   .[ , deaths_prop :=  ifelse( sex == 'm', 
                                - deaths / sum( deaths ),
                                deaths / sum( deaths ) ),
-     .( urb ) ]
+     .( urb ) ] %>%
+  setorder( urb, sex, age )
+
 
 ggplot() +
   geom_point( data = dat_census[ urb == 'rur' ],
@@ -91,3 +93,20 @@ check_heaping_whipple( Value = dat_census[ sex == 'm' & urb == 'rur' & age < 90 
                        Age = dat_census[ sex == 'm' & urb == 'rur' & age < 90 ]$age, 
                        ageMin = 20, ageMax = 65,
                        digit = c( 0, 5 ) )
+
+
+check_heaping_whipple( Value = dat_census[ sex == 'f' & urb == 'urb' & age < 90 ]$pop, 
+                       Age = dat_census[ sex == 'f' & urb == 'urb' & age < 90 ]$age, 
+                       ageMin = 20, ageMax = 65,
+                       digit = c( 0, 5 ) )
+
+check_heaping_whipple( Value = dat_census[ sex == 'f' & urb == 'rur' & age < 90 ]$pop, 
+                       Age = dat_census[ sex == 'f' & urb == 'rur' & age < 90 ]$age, 
+                       ageMin = 20, ageMax = 65,
+                       digit = c( 0, 5 ) )
+
+dat_census[, .( ratio = sum( deaths[age >=80] ) / sum( deaths[age >=60] ) ),.(urb,sex)]
+
+
+getHMDitemavail('SWE', username = 'zecosta.monteiro@gmail.com',password = 'papai123')
+readHMDweb()
